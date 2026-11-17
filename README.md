@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/readme/icon.svg" alt="AntiGem app icon" width="108">
+<img src="docs/readme/icon.png" alt="AntiGem app icon" width="108">
 
 # AntiGem (Custom Edition)
 
