@@ -136,7 +136,8 @@ enum class SettingsSection(val title: String, val subtitle: String) {
     TERMUX_API("Termux:API", "How termux-api commands are handled"),
     X11_DESKTOP("X11 Desktop", "Linux desktop apps with Termux:X11"),
     CHANGELOG("What's new", "Every AntiGem version and what changed"),
-    ABOUT("About & Info", "App version, package details, and bridge export");
+    ABOUT("About & Info", "App version, package details, and bridge export"),
+    DEV_SYNC("Dev Sync Dashboard", "Track Santoshkurmi and Aura updates");
 
     /** The Jarvis section this page shows (Settings → Jarvis → …), or null. */
     val jarvisPage: com.example.gemini.ui.jarvis.JarvisSettingsPage? get() = when (this) {
@@ -757,10 +758,16 @@ fun SettingsDialog(
                         cardBorder = cardBorder,
                         onOpenRea = { currentSection = SettingsSection.REA }
                     )
+                    SettingsSection.DEV_SYNC -> DevSyncDashboardScreen(
+                        cardBg = cardBg,
+                        cardBorder = cardBorder,
+                        onBack = { currentSection = SettingsSection.ABOUT }
+                    )
                     SettingsSection.ABOUT -> AboutSubScreen(
                         cardBg = cardBg,
                         cardBorder = cardBorder,
-                        onOpenChangelog = { currentSection = SettingsSection.CHANGELOG }
+                        onOpenChangelog = { currentSection = SettingsSection.CHANGELOG },
+                        onOpenDevSync = { currentSection = SettingsSection.DEV_SYNC }
                     )
                     SettingsSection.CHANGELOG -> ChangelogScreen(
                         cardBg = cardBg,
@@ -8448,7 +8455,8 @@ private fun DiagnosticsSubScreen(
 private fun AboutSubScreen(
     cardBg: Color,
     cardBorder: BorderStroke,
-    onOpenChangelog: () -> Unit = {}
+    onOpenChangelog: () -> Unit = {},
+    onOpenDevSync: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -8541,6 +8549,28 @@ private fun AboutSubScreen(
 
         // What's new: this version's changes, opens the full timeline
         WhatsNewCard(cardBg = cardBg, cardBorder = cardBorder, onClick = onOpenChangelog)
+        // Secret 5-tap or dev trigger card
+        Card(
+            shape = RoundedCornerShape(14.dp),
+            colors = CardDefaults.cardColors(containerColor = cardBg),
+            border = cardBorder,
+            modifier = Modifier.fillMaxWidth().clickable { onOpenDevSync() }
+        ) {
+            Row(
+                modifier = Modifier.padding(14.dp).fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Icon(Icons.Outlined.SyncAlt, contentDescription = null, tint = GeminiPurple)
+                    Column {
+                        Text("Upstream Sync & Monitor", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                        Text("Track Santoshkurmi & Aura git commits", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+                Icon(Icons.Outlined.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
 
         // 2. Package & Environment Details
         Card(
